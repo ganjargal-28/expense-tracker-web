@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
-
 import * as Yup from "yup";
+
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-
 import { useFormik } from "formik";
-import Logo from "./svg/Logo";
+
+import Logo from "../components/svg/Logo";
 
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -27,7 +27,7 @@ const Login = () => {
     onSubmit: async (values) => {
       setErrorMessage("");
       try {
-        const response = await fetch("http://localhost:3030/login", {
+        const response = await fetch("http://localhost:8000/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -36,8 +36,6 @@ const Login = () => {
         });
 
         const data = await response.json();
-        console.log("email", email.value);
-        console.log("pass", password);
         console.log("data", data);
 
         if (response.ok) {
@@ -48,7 +46,7 @@ const Login = () => {
           setErrorMessage(data.message || "Invalid credentials");
         }
       } catch (error) {
-        setErrorMessage("Network error");
+        setErrorMessage(`Network error ${error}`);
       }
     },
   });

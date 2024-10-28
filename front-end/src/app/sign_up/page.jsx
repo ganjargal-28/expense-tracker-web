@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import LogoIN from "../components/svg/LogoIN";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -40,13 +41,15 @@ const SignUp = () => {
           body: JSON.stringify(values),
         });
         const data = await response.json();
+
         if (response.ok) {
-          router.push("/");
+          toast.success("Your signup was successful! You can now log in.");
+          router.push("/login");
         } else {
-          setErrorMessage(data.message || "An error occurred");
+          toast.error(data.message || "Error occurred during signup");
         }
       } catch (error) {
-        setErrorMessage("Network Error");
+        toast.error("Network error, please try again later");
       }
     },
   });

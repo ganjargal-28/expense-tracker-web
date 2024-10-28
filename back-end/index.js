@@ -1,20 +1,27 @@
-import express from "express";
+import { neon } from "@neondatabase/serverless";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import express, { request } from "express";
 import cors from "cors";
-import { neon } from "@neondatabase/serverless";
-
+// import bcrypt from "bcrypt";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: "*", // allow requests from this origin
+  methods: "GET,POST", // allow these methods
+  allowedHeaders: ["Content-Type"], // allow these headers
+  credentials: true, // include credentials
+  maxAge: 3600, // cache preflight results for 1 hour
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 const port = 8000;
 const sql = neon(`${process.env.DATABASE_URL}`);
 
-app.post("/users", async (req, res) => {
-  const { email, password } = req.body;
+app.post("/sign_up", async (req, res) => {
+  const {name, email, password } = req.body;
 
   try {
     const existingUser = await sql`SELECT * FROM users WHERE email = ${email}`;
@@ -24,10 +31,12 @@ app.post("/users", async (req, res) => {
     }
 
     const newUser = await sql`
-        INSERT INTO users (email, password) 
-        VALUES (${email}, ${password})
+        INSERT INTO users (name,email, password) 
+        VALUES (${name},${email}, ${password})
         RETURNING id, email
       `;
+   console.log("asd",newUser);
+   
 
     res
       .status(201)
@@ -35,11 +44,11 @@ app.post("/users", async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Internal server error during create user" });
+      .json({ message: `Internal server error during create user:  ${error}` });
   }
 });
 
-app.post("/sign_up", async (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
