@@ -36,11 +36,11 @@ const Login = () => {
         });
 
         const data = await response.json();
-        console.log("data", data);
+        
 
         if (response.ok) {
           toast.success("Login successful!");
-          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("userId", data.user.id);
           router.push("/dashboard");
         } else {
           setErrorMessage(data.message || "Invalid credentials");

@@ -1,13 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { IncomeExpense } from "../components/IncomeExpense";
 import { Barchart } from "../components/BarChart";
+import AddRecord from "../components/AddRecord";
 
 const DashBoardPage = () => {
-  const [dashboard, setDashboard] = useState("")
+ const [info, setInfo] = useState([]);
+  useEffect(() => {
+   
+    const fetchDate = async () => {
+    const user_Id = localStorage.getItem(user_Id);
+    try {
+      const response = await fetch(
+        `http://localhost:8000/record?user_id=${user_Id}`
+      );
+      if (!response.ok) {
+        throw new error("failed to fetch data");
+      }
+      const data = await response.json();
+      setInfo(data);
+    } catch (error) {
+      console.error("errr", error);
+    }
+    };
+    fetchDate();
+  }, []);
   return (
     <div className="w-full bg-gray-300">
       <div className="container mx-auto bg-[#ffff]">
@@ -22,9 +42,29 @@ const DashBoardPage = () => {
                 </Link>
               </div>
               <div className="flex items-center gap-4">
-                <button className="btn btn-primary rounded-s-full rounded-e-full btn-sm">
-                  Add Record
-                </button>
+                <div>
+                  {/* Open the modal using document.getElementById('ID').showModal() method */}
+                  <button
+                    className="btn"
+                    onClick={() =>
+                      document.getElementById("my_modal_1").showModal()
+                    }
+                  >
+                    add record
+                  </button>
+                  <dialog id="my_modal_1" className="modal">
+                    <div className="modal-box">
+                      <h3 className="font-bold text-lg">Hello!</h3>
+                      <AddRecord />
+                      <div className="modal-action">
+                        <form method="dialog">
+                          {/* if there is a button in form, it will close the modal */}
+                          <button className="btn">Close</button>
+                        </form>
+                      </div>
+                    </div>
+                  </dialog>
+                </div>
                 <div className="avatar">
                   <div className="w-14 rounded-full">
                     <img
@@ -87,24 +127,15 @@ const DashBoardPage = () => {
 
             <div className="card bg-base-300 carousel carousel-vertical w-full rounded-box p-5">
               <div className="text-lg font-semibold mb-4">Last Records</div>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center border-b py-2">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-blue-500 text-white p-2 rounded-full">
-                      <span className="material-icons text-2xl">home</span>
-                    </div>
-
-                    <div>
-                      <div className="text-md font-semibold">
-                        Lending & Renting
-                      </div>
-                      <div className="text-sm text-gray-400">3 hours ago</div>
-                    </div>
-                  </div>
-
-                  <div className="text-green-500 font-semibold">- 1,000 ₹</div>
+              {info.map((infos) => (
+                <div
+                  key={infos.id}
+                  className="flex  justify-between items-center  "
+                >
+                  <div>{infos.name}</div>
+                  <div>{infos.amount}</div>
                 </div>
-              </div>
+              ))}
             </div>
           </main>
         </div>
@@ -114,3 +145,4 @@ const DashBoardPage = () => {
 };
 
 export default DashBoardPage;
+

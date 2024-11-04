@@ -21,7 +21,7 @@ const port = 8000;
 const sql = neon(`${process.env.DATABASE_URL}`);
 
 app.post("/sign_up", async (req, res) => {
-  const {name, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     const existingUser = await sql`SELECT * FROM users WHERE email = ${email}`;
@@ -35,8 +35,7 @@ app.post("/sign_up", async (req, res) => {
         VALUES (${name},${email}, ${password})
         RETURNING id, email
       `;
-   console.log("asd",newUser);
-   
+    console.log("asd", newUser);
 
     res
       .status(201)
@@ -48,6 +47,101 @@ app.post("/sign_up", async (req, res) => {
   }
 });
 
+app.get("/record", async (req, res) => {
+  const { user_id } = req.query; // Query params-аас user_id авах
+
+  try {
+    // Record болон category хүснэгтийг JOIN хийж авах
+    const records = await sql`
+       SELECT 
+        r.*,                    
+        c.name as category_name 
+      FROM record r
+      LEFT JOIN category c ON r.category_id = c.id 
+      WHERE r.user_id= ${user_id}
+      ORDER BY r.createdAt DESC   
+    `;
+
+    res.status(200).json(records);
+  } catch (error) {
+    console.error("Error fetching records:", error);
+    res.status(500).json({
+      message: `Internal server error during fetch records: ${error}`,
+    });
+  }
+});
+app.get("/transaction" , async (req,res)=>{
+const transaction = await sql`
+`
+})
+app.get("/category", async (req, res) => {
+  try {
+    const categories = await sql`SELECT * FROM category ORDER BY id`;
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error while fetching categories" });
+  }
+});
+app.post("/category", async (req, res) => {
+  const { name, description, category_icon, icon_color } = req.body;
+  
+  try {
+    const newCategory = await sql`
+      INSERT INTO category (name, description, category_icon, icon_color)
+      VALUES (${name}, ${description}, ${category_icon}, ${icon_color})
+      RETURNING *
+    `;
+    res.status(201).json(newCategory[0]);
+  } catch (error) {
+    console.error("Error adding category:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error while adding category" });
+  }
+});
+
+app.post("/record", async (req, res) => {
+  const { user_id, payee, amount, type, note, category_id } =
+    req.body;
+console.log("req body", req.body);
+  try {
+    const newRecord = await sql`
+      INSERT INTO record (
+        user_id,
+        name,
+        amount, 
+        transaction_type,
+        description,
+        category_id,
+        createdAt,    
+        updatedAt     
+      ) 
+      VALUES (
+        ${user_id},
+        ${payee},
+        ${amount},
+        ${type},
+        ${note || null},
+        ${category_id},
+        NOW(),
+        NOW()
+      )
+      RETURNING *
+    `;
+
+    res.status(201).json({
+      message: "Record created successfully",
+      record: newRecord[0],
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: ` ${error}`,
+    });
+  }
+});
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
