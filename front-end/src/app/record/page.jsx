@@ -44,7 +44,7 @@ const RecordsPage = () => {
           `http://localhost:8000/record?user_id=${userId}`
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch records");
+          throw  Error("Failed to fetch records");
         }
         const data = await response.json();
         setRecords(data);

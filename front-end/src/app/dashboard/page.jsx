@@ -6,25 +6,27 @@ import Link from "next/link";
 import { IncomeExpense } from "../components/IncomeExpense";
 import { Barchart } from "../components/BarChart";
 import AddRecord from "../components/AddRecord";
+import { AddDashboard } from "../components/AddDashboard";
 
 const DashBoardPage = () => {
- const [info, setInfo] = useState([]);
+  const [info, setInfo] = useState([]);
+  console.log('info is:',info)
   useEffect(() => {
-   
     const fetchDate = async () => {
-    const user_Id = localStorage.getItem(user_Id);
-    try {
-      const response = await fetch(
-        `http://localhost:8000/record?user_id=${user_Id}`
-      );
-      if (!response.ok) {
-        throw new error("failed to fetch data");
+      const userid = localStorage.getItem("userid");
+      try {
+        const response = await fetch(
+          `http://localhost:8000/transactions/${userid}`
+        );
+        if (!response.ok) {
+          throw new error("failed to fetch data");
+        }
+        const data = await response.json();
+        setInfo(data);
+
+      } catch (error) {
+        console.error("errr", error);
       }
-      const data = await response.json();
-      setInfo(data);
-    } catch (error) {
-      console.error("errr", error);
-    }
     };
     fetchDate();
   }, []);
@@ -55,7 +57,7 @@ const DashBoardPage = () => {
                   <dialog id="my_modal_1" className="modal">
                     <div className="modal-box">
                       <h3 className="font-bold text-lg">Hello!</h3>
-                      <AddRecord />
+                      <AddDashboard />
                       <div className="modal-action">
                         <form method="dialog">
                           {/* if there is a button in form, it will close the modal */}
@@ -145,4 +147,3 @@ const DashBoardPage = () => {
 };
 
 export default DashBoardPage;
-

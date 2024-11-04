@@ -8,24 +8,24 @@ const AddRecord = () => {
   const [transactionType, setTransactionType] = useState("EXP");
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [categories, setCategories] = useState([]) // Step 1: Form, Step 2: Category
-  const [userId, setUserId] = useState('')
+  const [categories, setCategories] = useState([]); // Step 1: Form, Step 2: Category
+  const [userId, setUserId] = useState("");
   const today = format(new Date(), "yyyy-MM-dd");
   const now = format(new Date(), "HH:mm");
 
-  useEffect(()=>{
-    const userId = localStorage.getItem('userId')
-    setUserId(userId)
-  },[])
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    setUserId(userId);
+  }, []);
 
-useEffect(()=>{
-  const fetchCategories = async()=>{
-    const response = await fetch('http://localhost:8000/category')
-    const data = await response.json()
-    setCategories(data)
-  }
-  fetchCategories()
-},[])
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await fetch("http://localhost:8000/category");
+      const data = await response.json();
+      setCategories(data);
+    };
+    fetchCategories();
+  }, []);
   const formik = useFormik({
     initialValues: {
       amount: "",
@@ -42,43 +42,43 @@ useEffect(()=>{
       payee: Yup.string().required("Payee is required"),
       note: Yup.string(),
     }),
-    onSubmit:  async (values) => {
-        try {
-      setIsLoading(true);
+    onSubmit: async (values) => {
+      try {
+        setIsLoading(true);
 
-      const record = {
-        ...values,
-        type: transactionType,
-        amount: Number(values.amount),
-        createdAt: new Date().toISOString(),
-        user_id: userId
-      };
+        const record = {
+          ...values,
+          type: transactionType,
+          amount: Number(values.amount),
+          createdAt: new Date().toISOString(),
+          user_id: userId,
+        };
 
-      const response = await fetch("http://localhost:8000/record", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(record),
-      });
+        const response = await fetch("http://localhost:8000/record", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(record),
+        });
 
-      if (!r+esponse.ok) {
-        const data= await response.json()
-        alert(`error: ${data.message}`)
+        if (!response.ok) {
+          const data = await response.json();
+          alert(`error: ${data.message}`);
+        }
+
+        document.getElementById("my_modal_3").close();
+        alert("Record added successfully!");
+        formik.resetForm();
+        setCurrentStep(1);
+      } catch (error) {
+        console.error("Error adding record:", error);
+        console.log(`error is${error}`);
+        alert("Failed to add record. Please try again." + error);
+      } finally {
+        setIsLoading(false);
       }
-
-      document.getElementById("my_modal_3").close();
-      alert("Record added successfully!");
-      formik.resetForm();
-      setCurrentStep(1);
-    } catch (error) {
-      console.error("Error adding record:", error);
-      console.log( `error is${error}`)
-      alert("Failed to add record. Please try again." + error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    },
   });
 
   const handleCategorySelect = (categoryName) => {
@@ -150,9 +150,16 @@ useEffect(()=>{
             </div>
           </div>
           <div>
-            <select name="category_id" className="select select-primary w-full max-w-xs" value={formik.values.category_id} onChange={formik.handleChange}>
-              {categories.map((category)=>(
-                <option key={category.id} value={category.id}>{category.name}</option>
+            <select
+              name="category_id"
+              className="select select-primary w-full max-w-xs"
+              value={formik.values.category_id}
+              onChange={formik.handleChange}
+            >
+              {categories?.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
               ))}
             </select>
           </div>

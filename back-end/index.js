@@ -70,10 +70,17 @@ app.get("/record", async (req, res) => {
     });
   }
 });
-app.get("/transaction" , async (req,res)=>{
-const transaction = await sql`
-`
-})
+app.get("/transactions/:userId", async (req, res) => {
+  const  userid  = req.params.userId;
+  try {
+    const transactions =
+      await sql`SELECT * FROM transactions WHERE userid=${userid}`;
+    res.status(200).json(transactions);
+  } catch (error) {
+    console.error("ererr", error);
+    req.status(500).json({ message: "aldaa" });
+  }
+});
 app.get("/category", async (req, res) => {
   try {
     const categories = await sql`SELECT * FROM category ORDER BY id`;
@@ -85,9 +92,23 @@ app.get("/category", async (req, res) => {
       .json({ message: "Internal server error while fetching categories" });
   }
 });
+app.post("/transactions", async (req, res) => {
+  const { name, amount, category_id } = req.body;
+  try {
+    const newDashboard =
+      await sql`INSERT INTO transactions (name,amount,category_id)
+    VALUE (${name},${amount},${category_id})
+    RETURNING *
+    `;
+    res.status(201).json(newDashboard[0]);
+  } catch (error) {
+    console.error("eriire", error);
+    res.status(500).json({ message: "fail transactions" });
+  }
+});
 app.post("/category", async (req, res) => {
   const { name, description, category_icon, icon_color } = req.body;
-  
+
   try {
     const newCategory = await sql`
       INSERT INTO category (name, description, category_icon, icon_color)
@@ -104,9 +125,8 @@ app.post("/category", async (req, res) => {
 });
 
 app.post("/record", async (req, res) => {
-  const { user_id, payee, amount, type, note, category_id } =
-    req.body;
-console.log("req body", req.body);
+  const { user_id, payee, amount, type, note, category_id } = req.body;
+  console.log("req body", req.body);
   try {
     const newRecord = await sql`
       INSERT INTO record (
