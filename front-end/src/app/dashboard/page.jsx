@@ -6,29 +6,28 @@ import Link from "next/link";
 import { IncomeExpense } from "../components/IncomeExpense";
 import { Barchart } from "../components/BarChart";
 import AddRecord from "../components/AddRecord";
-import { AddDashboard } from "../components/AddDashboard";
 
 const DashBoardPage = () => {
   const [info, setInfo] = useState([]);
-  console.log('info is:',info)
+  console.log("info is:", info);
   useEffect(() => {
-    const fetchDate = async () => {
-      const userid = localStorage.getItem("userid");
+    const fetchData = async () => {
+      const userid = localStorage.getItem("userId");
+      console.log("userid", userid);
+
       try {
         const response = await fetch(
-          `http://localhost:8000/transactions/${userid}`
+          `http://localhost:8000/record?user_id=${userId}`
         );
-        if (!response.ok) {
-          throw new error("failed to fetch data");
-        }
         const data = await response.json();
-        setInfo(data);
+        console.log("info:", data);
 
+        setInfo(data);
       } catch (error) {
-        console.error("errr", error);
+        console.log("Error");
       }
     };
-    fetchDate();
+    fetchData();
   }, []);
   return (
     <div className="w-full bg-gray-300">
@@ -57,7 +56,7 @@ const DashBoardPage = () => {
                   <dialog id="my_modal_1" className="modal">
                     <div className="modal-box">
                       <h3 className="font-bold text-lg">Hello!</h3>
-                      <AddDashboard />
+                      <AddRecord />
                       <div className="modal-action">
                         <form method="dialog">
                           {/* if there is a button in form, it will close the modal */}
@@ -127,11 +126,12 @@ const DashBoardPage = () => {
               </div>
             </div>
 
-            <div className="card bg-base-300 carousel carousel-vertical w-full rounded-box p-5">
+            <div className="card bg-base-300 h-28 carousel carousel-vertical w-full rounded-box p-5">
               <div className="text-lg font-semibold mb-4">Last Records</div>
+
               {info.map((infos) => (
                 <div
-                  key={infos.id}
+                  key={infos.userid}
                   className="flex  justify-between items-center  "
                 >
                   <div>{infos.name}</div>

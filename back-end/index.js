@@ -71,14 +71,15 @@ app.get("/record", async (req, res) => {
   }
 });
 app.get("/transactions/:userId", async (req, res) => {
-  const  userid  = req.params.userId;
+  const { userId } = req.params;
+  console.log("id", userId);
+
   try {
     const transactions =
-      await sql`SELECT * FROM transactions WHERE userid=${userid}`;
+      await sql`SELECT * FROM transactions WHERE userid=${userId}`;
     res.status(200).json(transactions);
   } catch (error) {
-    console.error("ererr", error);
-    req.status(500).json({ message: "aldaa" });
+    req.status(500).json({ message: `${error}` });
   }
 });
 app.get("/category", async (req, res) => {
@@ -87,17 +88,18 @@ app.get("/category", async (req, res) => {
     res.status(200).json(categories);
   } catch (error) {
     console.error("Error fetching categories:", error);
-    res
+    req
       .status(500)
       .json({ message: "Internal server error while fetching categories" });
   }
 });
 app.post("/transactions", async (req, res) => {
-  const { name, amount, category_id } = req.body;
+  const { userid, name, amount, category_id } = req.body;
+
   try {
     const newDashboard =
-      await sql`INSERT INTO transactions (name,amount,category_id)
-    VALUE (${name},${amount},${category_id})
+      await sql`INSERT INTO transactions (userid,name,amount,category_id)
+    VALUE (${userid}, ${name},${amount},${category_id})
     RETURNING *
     `;
     res.status(201).json(newDashboard[0]);

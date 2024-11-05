@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -21,6 +21,8 @@ ChartJS.register(
 );
 
 export const Barchart = () => {
+  const [chartdata, setChartdata] = useState({});
+  const [chartoption, setChartoption] = useState({});
   const data = {
     labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6"],
     datasets: [
