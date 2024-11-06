@@ -1,5 +1,4 @@
-"use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -20,51 +19,61 @@ ChartJS.register(
   Legend
 );
 
-export const Barchart = () => {
-  const [chartdata, setChartdata] = useState({});
+export const Barchart = async () => {
+  const [chartdata, setChartdata] = useState({ datasets: [], labels: [] });
   const [chartoption, setChartoption] = useState({});
-  const data = {
-    labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6"],
-    datasets: [
-      {
-        label: "Income",
-        data: [700000, 750000, 750000, 650000, 600000, 650000],
-        backgroundColor: "#84CC16",
-      },
-      {
-        label: "Expense",
-        data: [400000, 620000, 500000, 400000, 550000, 450000],
-        backgroundColor: "#F97316",
-      },
-    ],
-  };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "Income - Expense",
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: function (value) {
-            return value.toLocaleString("en-US", {
-              style: "currency",
-              currency: "USD",
-            });
+  const fetchChartData = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/record?user_id=${userId}`
+      );
+      console.log(res);
+
+      // Extract labels and data
+      const Cost = res.data.map((dataObj) => parseInt(dataObj.Cost, 10));
+      const No = res.data.map((dataObj) => parseInt(dataObj.StartD, 10));
+
+      // Update chart data state
+      setChartdata({
+        labels: No,
+        datasets: [
+          {
+            label: "Daily Cost",
+            data: Cost,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1,
+          },
+        ],
+      });
+      setChartoption({
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "top" },
+          title: { display: true, text: "Income - Expense" },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) =>
+                value.toLocaleString("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                }),
+            },
           },
         },
-      },
-    },
+      });
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
   };
+  useEffect(() => {
+    fetchChartData();
+  }, []);
 
   return (
     <div
@@ -77,7 +86,7 @@ export const Barchart = () => {
         boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Bar data={data} options={options} />
+      <Bar data={chartdata} options={chartoption} />
     </div>
   );
 };

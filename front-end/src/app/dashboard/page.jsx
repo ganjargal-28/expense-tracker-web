@@ -12,8 +12,8 @@ const DashBoardPage = () => {
   console.log("info is:", info);
   useEffect(() => {
     const fetchData = async () => {
-      const userid = localStorage.getItem("userId");
-      console.log("userid", userid);
+      const userId = localStorage.getItem("userId");
+      console.log("userid", userId);
 
       try {
         const response = await fetch(
@@ -125,14 +125,12 @@ const DashBoardPage = () => {
                 <IncomeExpense />
               </div>
             </div>
-
-            <div className="card bg-base-300 h-28 carousel carousel-vertical w-full rounded-box p-5">
-              <div className="text-lg font-semibold mb-4">Last Records</div>
-
+            <div className="text-lg font-semibold mb-4">Last Records</div>
+            <div className="w-full flex carousel carousel-vertical flex-col gap-3 overflow-y-scroll h-[200px] scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
               {info.map((infos) => (
                 <div
                   key={infos.userid}
-                  className="flex  justify-between items-center  "
+                  className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between  "
                 >
                   <div>{infos.name}</div>
                   <div>{infos.amount}</div>
