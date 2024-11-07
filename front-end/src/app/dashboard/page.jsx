@@ -9,7 +9,7 @@ import AddRecord from "../components/AddRecord";
 
 const DashBoardPage = () => {
   const [info, setInfo] = useState([]);
-  console.log("info is:", info);
+
   useEffect(() => {
     const fetchData = async () => {
       const userId = localStorage.getItem("userId");
@@ -126,16 +126,18 @@ const DashBoardPage = () => {
               </div>
             </div>
             <div className="text-lg font-semibold mb-4">Last Records</div>
-            <div className="w-full flex carousel carousel-vertical flex-col gap-3 overflow-y-scroll h-[200px] scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
-              {info.map((infos) => (
-                <div
-                  key={infos.userid}
-                  className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between  "
-                >
-                  <div>{infos.name}</div>
-                  <div>{infos.amount}</div>
-                </div>
-              ))}
+            <div>
+              <div className="w-full flex carousel carousel-vertical flex-col gap-3 overflow-y-scroll h-[200px] scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
+                {info.map((infos) => (
+                  <div
+                    key={infos.userid}
+                    className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between  "
+                  >
+                    <div>{infos.name}</div>
+                    <div>{infos.amount}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </main>
         </div>

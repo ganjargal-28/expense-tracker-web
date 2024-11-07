@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
+import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,62 +19,74 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+const chartDefaultOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: "top" },
+    title: { display: true, text: "Income - Expense" },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: "Date",
+      },
+    },
+    y: {
+      beginAtZero: true,
+      ticks: {
+        callback: (value) =>
+          value.toLocaleString("en-US", { style: "currency", currency: "MNT" }),
+      },
+    },
+  },
+};
 
-export const Barchart = async () => {
-  const [chartdata, setChartdata] = useState({ datasets: [], labels: [] });
-  const [chartoption, setChartoption] = useState({});
+export const Barchart = () => {
+  const [chartData, setChartData] = useState({ datasets: [], labels: [] });
+  const [chartOption, setChartOption] = useState(chartDefaultOptions);
 
-  const fetchChartData = async () => {
+  const fetchChartData = useCallback(async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.log("No userId found in localStorage.");
+      return;
+    }
+
     try {
-      const res = await axios.get(
-        `http://localhost:8000/record?user_id=${userId}`
-      );
-      console.log(res);
+      const response = await fetch(`http://localhost:8000/record`, {
+        params: { user_id: userId, calc: "month" },
+      });
+      const data = response.data;
 
-      // Extract labels and data
-      const Cost = res.data.map((dataObj) => parseInt(dataObj.Cost, 10));
-      const No = res.data.map((dataObj) => parseInt(dataObj.StartD, 10));
+      if (!Array.isArray(data)) {
+        console.log("Unexpected data format:", data);
+        return;
+      }
 
-      // Update chart data state
-      setChartdata({
-        labels: No,
+      const Cost = data.map((entry) => parseInt(entry.Cost, 10));
+      const Dates = data.map((entry) => entry.StartD);
+
+      setChartData({
+        labels: Dates,
         datasets: [
           {
             label: "Daily Cost",
             data: Cost,
-            backgroundColor: backgroundColors,
-            borderColor: borderColors,
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: "rgba(75, 192, 192, 1)",
             borderWidth: 1,
           },
         ],
       });
-      setChartoption({
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: "top" },
-          title: { display: true, text: "Income - Expense" },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: (value) =>
-                value.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }),
-            },
-          },
-        },
-      });
-    } catch (err) {
-      console.error("Error fetching data:", err);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  };
+  }, []);
   useEffect(() => {
     fetchChartData();
-  }, []);
+  }, [fetchChartData]);
 
   return (
     <div
@@ -86,7 +99,7 @@ export const Barchart = async () => {
         boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Bar data={chartdata} options={chartoption} />
+      <Bar data={chartData} options={chartOption} />
     </div>
   );
 };

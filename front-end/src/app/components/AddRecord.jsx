@@ -67,7 +67,6 @@ const AddRecord = () => {
           alert(`error: ${data.message}`);
         }
 
-        document.getElementById("my_modal_3").close();
         alert("Record added successfully!");
         formik.resetForm();
         setCurrentStep(1);

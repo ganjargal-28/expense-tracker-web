@@ -48,10 +48,25 @@ app.post("/sign_up", async (req, res) => {
 });
 
 app.get("/record", async (req, res) => {
-  const { user_id } = req.query; // Query params-аас user_id авах
-
+  const { user_id, calc } = req.query; // Query params-аас user_id авах
   try {
     // Record болон category хүснэгтийг JOIN хийж авах
+    if (calc === "month") {
+      const monthIncomeExpense = await sql`
+      SELECT 
+    transaction_type,
+    SUM(amount)::BIGINT AS total_amount
+FROM 
+    record
+WHERE 
+    user_id=${user_id} AND
+    CURRENT_DATE >= DATE_TRUNC('month', CURRENT_DATE )
+    AND CURRENT_DATE < DATE_TRUNC('month', CURRENT_DATE+INTERVAL '1 month')
+GROUP BY 
+    transaction_type;
+      `;
+      res.status(200).json(monthIncomeExpense);
+    }
     const records = await sql`
        SELECT 
         r.*,                    
