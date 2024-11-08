@@ -6,10 +6,13 @@ import AddRecord from "../components/AddRecord";
 import AddCategory from "../components/AddCategory";
 
 const RecordsPage = () => {
-  const [selectedType, setSelectedType] = useState("all");
+  const [selectedType, setSelectedType] = useState("");
+
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
   const [records, setRecords] = useState([]);
+  const [filteredRecord, setFilteredRecord] = useState([]);
+
   const refreshCategories = async () => {
     try {
       const response = await fetch("http://localhost:8000/category");
@@ -43,9 +46,7 @@ const RecordsPage = () => {
         const response = await fetch(
           `http://localhost:8000/record?user_id=${userId}`
         );
-        if (!response.ok) {
-          throw  Error("Failed to fetch records");
-        }
+
         const data = await response.json();
         setRecords(data);
       } catch (error) {
@@ -56,7 +57,22 @@ const RecordsPage = () => {
     fetchCategories();
     fetchRecords();
   }, []);
+  const filterRecord = () => {
+    const filteredBySelectedTypeRecord = records.filter(
+      (record) => record?.transaction_type === selectedType
+    );
+    const filteredBySearchValueRecord = filteredBySelectedTypeRecord.filter(
+      (record) => record?.name.toLowerCase().includes(searchTerm)
+    );
 
+    console.log(filteredBySelectedTypeRecord, filteredBySearchValueRecord);
+
+    setFilteredRecord(filteredBySearchValueRecord);
+  };
+
+  useEffect(() => {
+    filterRecord();
+  }, [selectedType, searchTerm]);
   return (
     <div className="w-full">
       <div className="flex justify-center flex-col items-center gap-5">
@@ -98,11 +114,9 @@ const RecordsPage = () => {
         </header>
 
         <main className="w-[55vw] flex gap-5">
-          {/* Left Sidebar */}
           <div className="card w-72 bg-base-200 border-[1px] h-screen border-base-300 py-5 px-3 gap-5">
             <div className="text-2xl font-semibold">Records</div>
             <div className="flex flex-col gap-4">
-              {/* Open the modal using document.getElementById('ID').showModal() method */}
               <button
                 className="btn"
                 onClick={() =>
@@ -114,7 +128,6 @@ const RecordsPage = () => {
               <dialog id="my_modal_5" className="modal">
                 <div className="modal-action">
                   <form method="dialog">
-                    {/* if there is a button in form, it will close the modal */}
                     <button className="btn">Close</button>
                   </form>
                 </div>
@@ -144,7 +157,6 @@ const RecordsPage = () => {
               </label>
             </div>
 
-            {/* Types */}
             <div className="flex flex-col gap-3">
               <div className="text-md font-semibold">Types</div>
               <div className="form-control flex flex-col ml-2">
@@ -163,8 +175,8 @@ const RecordsPage = () => {
                     type="radio"
                     name="type"
                     className="radio radio-primary"
-                    checked={selectedType === "income"}
-                    onChange={() => setSelectedType("income")}
+                    checked={selectedType === "INC"}
+                    onChange={() => setSelectedType("INC")}
                   />
                   <span className="label-text ml-2">Income</span>
                 </label>
@@ -173,15 +185,14 @@ const RecordsPage = () => {
                     type="radio"
                     name="type"
                     className="radio radio-primary"
-                    checked={selectedType === "expense"}
-                    onChange={() => setSelectedType("expense")}
+                    checked={selectedType === "EXP"}
+                    onChange={() => setSelectedType("EXP")}
                   />
                   <span className="label-text ml-2">Expense</span>
                 </label>
               </div>
             </div>
 
-            {/* Categories */}
             <div className="flex w-full justify-between items-center">
               <div className="text-md font-semibold">Category</div>
               <button
@@ -204,12 +215,10 @@ const RecordsPage = () => {
                       <p>{category.name}</p>
                     </div>
                   ))}
-                  {/* Open the modal using document.getElementById('ID').showModal() method */}
                 </div>
               </div>
             </div>
             <div>
-              {/* Open the modal using document.getElementById('ID').showModal() method */}
               <button
                 className="btn"
                 onClick={() =>
@@ -228,7 +237,6 @@ const RecordsPage = () => {
                   />
                   <div className="modal-action">
                     <form method="dialog">
-                      {/* if there is a button in form, it will close the modal */}
                       <button className="btn">Close</button>
                     </form>
                   </div>
@@ -237,7 +245,6 @@ const RecordsPage = () => {
             </div>
           </div>
 
-          {/* Right Content */}
           <div className="w-[75%] flex flex-col gap-5">
             <div className="w-full flex justify-between">
               <div className="flex items-center gap-3">
@@ -270,7 +277,7 @@ const RecordsPage = () => {
 
             <div className="w-full flex flex-col gap-3 overflow-y-scroll h-[calc(100vh-250px)] scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
               <div>Today</div>
-              {records.map((record) => (
+              {filteredRecord.map((record) => (
                 <div
                   key={record.id}
                   className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"

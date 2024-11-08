@@ -37,7 +37,7 @@ const chartDefaultOptions = {
       beginAtZero: true,
       ticks: {
         callback: (value) =>
-          value.toLocaleString("en-US", { style: "currency", currency: "MNT" }),
+          value.toLocaleString("MNT", { style: "currency", currency: "MNT" }),
       },
     },
   },

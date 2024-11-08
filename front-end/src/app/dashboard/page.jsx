@@ -44,7 +44,7 @@ const DashBoardPage = () => {
               </div>
               <div className="flex items-center gap-4">
                 <div>
-                  {/* Open the modal using document.getElementById('ID').showModal() method */}
+                 
                   <button
                     className="btn"
                     onClick={() =>
@@ -59,7 +59,7 @@ const DashBoardPage = () => {
                       <AddRecord />
                       <div className="modal-action">
                         <form method="dialog">
-                          {/* if there is a button in form, it will close the modal */}
+            
                           <button className="btn">Close</button>
                         </form>
                       </div>
@@ -79,7 +79,7 @@ const DashBoardPage = () => {
           </header>
           <main className="flex flex-col gap-5 bg-base-200 mt-4 pb-[70px]">
             <div className="flex gap-5">
-              {/* Cash Card */}
+         
               <div className="card bg-blue-500 text-white w-[18vw] rounded-lg  p-5">
                 <div className="flex flex-col">
                   <div className="text-lg font-bold">Geld</div>
@@ -88,7 +88,7 @@ const DashBoardPage = () => {
                 </div>
               </div>
 
-              {/* Income Card */}
+  
               <div className="card bg-base-100 w-[18vw] rounded-box p-5">
                 <div className="text-lg flex items-center gap-4 font-semibold text-green-500">
                   <img src="/green.png" alt="" />
@@ -102,7 +102,6 @@ const DashBoardPage = () => {
                 </div>
               </div>
 
-              {/* Expenses Card */}
               <div className="card bg-base-100 w-[18vw] rounded-box p-5">
                 <div className="text-lg flex items-center gap-4 font-semibold text-blue-500">
                   <img src="/blue.png" alt="" />
@@ -119,7 +118,7 @@ const DashBoardPage = () => {
 
             <div className="grid grid-cols-[1fr_1fr] gap-6">
               <div className=" w-full h-full">
-                <Barchart />
+                <Barchart  />
               </div>
               <div className="w-full h-full">
                 <IncomeExpense />
