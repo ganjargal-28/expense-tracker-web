@@ -48,10 +48,10 @@ app.post("/sign_up", async (req, res) => {
 });
 
 app.get("/record", async (req, res) => {
-  const { user_id, calc } = req.query; // Query params-аас user_id авах
+  const { user_id, CAL } = req.query; // Query params-аас user_id авах
   try {
     // Record болон category хүснэгтийг JOIN хийж авах
-    if (calc === "month") {
+    if (CAL === "month") {
       const monthIncomeExpense = await sql`
       SELECT 
     transaction_type,

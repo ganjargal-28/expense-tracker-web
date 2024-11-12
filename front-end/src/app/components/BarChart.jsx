@@ -55,10 +55,11 @@ export const Barchart = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/record`, {
-        params: { user_id: userId, calc: "month" },
+      const response = await axios.get(`http://localhost:8000/record`, {
+        params: { user_id: userId, CAL: "month" },
       });
       const data = response.data;
+      console.log(response);
 
       if (!Array.isArray(data)) {
         console.log("Unexpected data format:", data);
@@ -73,7 +74,7 @@ export const Barchart = () => {
         datasets: [
           {
             label: "Daily Cost",
-            data: Cost,
+            data: [65, 59, 80, 81, 56, 55, 40],
             backgroundColor: "rgba(75, 192, 192, 0.2)",
             borderColor: "rgba(75, 192, 192, 1)",
             borderWidth: 1,
@@ -84,9 +85,12 @@ export const Barchart = () => {
       console.error("Error fetching data:", error);
     }
   }, []);
+
   useEffect(() => {
     fetchChartData();
   }, [fetchChartData]);
+
+  console.log("chartData", chartData);
 
   return (
     <div
